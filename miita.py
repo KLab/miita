@@ -2,7 +2,8 @@
 import flask
 from flask import Flask
 from flask.ext.pymongo import PyMongo
-from flask.ext.googleauth import (GoogleFederated, GoogleAuth)
+from flask.ext.googleauth import GoogleFederated  # for Google Apps
+#from flask.ext.googleauth import GoogleAuth  # for Google account
 import markdown
 import datetime
 

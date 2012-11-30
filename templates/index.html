@@ -1,17 +1,17 @@
 {% extends 'layout.html' %}
 {% block content %}
-    <h1>Hello, world!</h1>
     <div class="row">
         <div class="span10">
             {% for article in articles %}
                 <article>
-                    <h2>title</h2>
+                    <h1>{{ article.title }}</h1>
                     {{ article.html|safe }}
                 </article>
             {% endfor %}
         </div>
         <div class="span2">
-            <h2>right</h2>
+            <a class="btn btn-primary" href="{{ url_for('edit') }}">新しい記事を投稿する</a>
+            <br>
         </div>
     </div>
 {% endblock %}

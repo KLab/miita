@@ -32,3 +32,9 @@ textarea.content-form {
     width: 500px;
     height: 400px;
 }
+
+article {
+    margin: 10px;
+    border: solid 1px;
+    border-radius: 15px;
+}
