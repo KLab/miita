@@ -2,14 +2,16 @@
 {% block content %}
     <div class="row">
         <div class="span10">
-            <h1>タイトル</h1>
-            <form method="post" action="{{ url_for('post') }}">
-                <textarea name="source">{{ source }}</textarea><br>
+            <form class="editform" method="post" action="{{ url_for('post') }}">
+                <label for="title">タイトル</label>
+                <input class="title-form" type="text" size="30" name="title">
+
+                <label for="source">内容</label>
+                <textarea class="content-form" name="source">{{ source }}</textarea><br/>
                 <input type="submit" value="保存">
             </form>
         </div>
         <div class="span2">
-            <h2>right</h2>
         </div>
     </div>
 {% endblock %}

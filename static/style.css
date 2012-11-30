@@ -24,3 +24,11 @@ div#header {
 #content {
     margin: 0px 20px;
 }
+
+input.title-form {
+    width: 500px;
+}
+textarea.content-form {
+    width: 500px;
+    height: 400px;
+}
