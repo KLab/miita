@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <div class="row">
+        <div class="span10">
+            <h1>タイトル</h1>
+            {{ article.html|safe }}
+        </div>
+        <div class="span2">
+            <h2>right</h2>
+        </div>
+    </div>
+{% endblock %}

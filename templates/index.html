@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <h1>Hello, world!</h1>
+    <div class="row">
+        <div class="span10">
+            {% for article in articles %}
+                <article>
+                    <h2>title</h2>
+                    {{ article.html|safe }}
+                </article>
+            {% endfor %}
+        </div>
+        <div class="span2">
+            <h2>right</h2>
+        </div>
+    </div>
+{% endblock %}
