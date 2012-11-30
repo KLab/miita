@@ -2,37 +2,44 @@
 import flask
 from flask import Flask
 from flask.ext.pymongo import PyMongo
+from flask.ext.googleauth import (GoogleFederated, GoogleAuth)
 import markdown
 
 
 app = Flask(__name__)
+app.secret_key = 'random secret key: Override on real environment'
 mongo = PyMongo(app)
-
+auth = GoogleFederated(app, 'klab.com')
+#auth = GoogleAuth(app)
 
 @app.route('/')
+@auth.required
 def index():
     articles = mongo.db.articles.find().limit(10).sort('_id', -1)
-    return flask.render_template('index.html', articles=articles)
+    return flask.render_template('index.html', articles=articles, user=flask.g.user)
 
 
 @app.route('/article/<ObjectId:article_id>')
+@auth.required
 def article(article_id):
     article = mongo.db.articles.find_one_or_404(article_id)
-    return flask.render_template('article.html', article=article)
+    return flask.render_template('article.html', article=article, user=flask.g.user)
 
 
 #@app.route('/edit/<ObjectId:article_id>')
 @app.route('/edit')
+@auth.required
 def edit(article_id=None):
     if article_id is None:
         source = ''
     else:
         article = mongo.db.articles.find_one_or_404(article_id)
         source = article.source
-    return flask.render_template('edit.html', source=source)
+    return flask.render_template('edit.html', source=source, user=flask.g.user)
 
 
 @app.route('/post', methods=['POSt'])
+@auth.required
 def post():
     article_id = flask.request.form.get('article')
     source = flask.request.form.get('source')
