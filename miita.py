@@ -19,6 +19,10 @@ auth = GoogleFederated(app, 'klab.com')
 @auth.required
 def index():
     articles = mongo.db.articles.find().limit(10).sort('_id', -1)
+    articles = list(articles)
+    for article in articles:
+        if not article.get('title'):
+            article['title'] = flask.Markup(article['source'].split('\n', 1)[0])
     return flask.render_template('index.html',
                                  articles=articles,
                                  user=flask.g.user)
@@ -33,7 +37,7 @@ def article(article_id):
                                  user=flask.g.user)
 
 
-#@app.route('/edit/<ObjectId:article_id>')
+@app.route('/edit/<ObjectId:article_id>')
 @app.route('/edit')
 @auth.required
 def edit(article_id=None):

@@ -38,3 +38,8 @@ article {
     border: solid 1px;
     border-radius: 15px;
 }
+
+article.summary {
+    max-height: 300px;
+    overflow: hidden;
+}

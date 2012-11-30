@@ -3,8 +3,10 @@
     <div class="row">
         <div class="span10">
             {% for article in articles %}
-                <article>
-                    <h1>{{ article.title }}</h1>
+                <article class="summary">
+                    <h1>
+                    <a href="{{ url_for('article', article_id=article._id) }}">{{ article.title }}</a>
+                    </h1>
                     {{ article.html|safe }}
                 </article>
             {% endfor %}
