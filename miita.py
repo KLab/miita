@@ -1,7 +1,8 @@
 # coding: utf-8
+import os
 import flask
 from flask import Flask
-from flask.ext.pymongo import PyMongo
+from flask.ext.pymongo import PyMongo, BSONObjectIdConverter
 from flask.ext.googleauth import GoogleFederated  # for Google Apps
 #from flask.ext.googleauth import GoogleAuth  # for Google account
 import markdown
@@ -10,7 +11,13 @@ import datetime
 
 app = Flask(__name__)
 app.secret_key = 'random secret key: Override on real environment'
+
+# override settings with envvar
+app.config.from_envvar('MIITA_SETTING_FILE', silent=True)
+
 mongo = PyMongo(app)
+#app.url_map.converters['ObjectId'] = BSONObjectIdConverter
+
 auth = GoogleFederated(app, 'klab.com')
 #auth = GoogleAuth(app)
 
