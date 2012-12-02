@@ -1,35 +1,58 @@
 # coding: utf-8
-import os
+import bson
+import datetime
 import flask
 from flask import Flask
-from flask.ext.pymongo import PyMongo, BSONObjectIdConverter
 from flask.ext.googleauth import GoogleFederated  # for Google Apps
 #from flask.ext.googleauth import GoogleAuth  # for Google account
 import markdown
-import datetime
+import pymongo
+import sys
+from werkzeug.routing import BaseConverter
+
+
+class ObjectIdConverter(BaseConverter):
+    def to_python(self, value):
+        return bson.ObjectId(value)
+
+    def to_url(self, value):
+        return str(value)
 
 
 app = Flask(__name__)
+app.url_map.converters['ObjectId'] = ObjectIdConverter
+
 app.secret_key = 'random secret key: Override on real environment'
 
 # override settings with envvar
 app.config.from_envvar('MIITA_SETTING_FILE', silent=True)
 
-mongo = PyMongo(app)
-#app.url_map.converters['ObjectId'] = BSONObjectIdConverter
-
 auth = GoogleFederated(app, 'klab.com')
 #auth = GoogleAuth(app)
+
+
+class MongoProxy(object):
+    @property
+    def con(self):
+        host = app.config.get('MONGO_URI', 'localhost')
+        self.__dict__['con'] = con = pymongo.MongoClient(host)
+        return con
+
+    @property
+    def db(self):
+        return self.con.miita
+
+mongo = MongoProxy()
 
 
 @app.route('/')
 @auth.required
 def index():
-    articles = mongo.db.articles.find().limit(10).sort('_id', -1)
-    articles = list(articles)
+    articles = mongo.db.articles.find().sort('_id', -1)[:10]
     for article in articles:
         if not article.get('title'):
-            article['title'] = flask.Markup(article['source'].split('\n', 1)[0])
+            article['title'] = flask.Markup(
+                    article['source'].split('\n', 1)[0])
     return flask.render_template('index.html',
                                  articles=articles,
                                  user=flask.g.user)
@@ -38,7 +61,9 @@ def index():
 @app.route('/article/<ObjectId:article_id>')
 @auth.required
 def article(article_id):
-    article = mongo.db.articles.find_one_or_404(article_id)
+    article = mongo.db.articles.find_one(article_id)
+    if article is None:
+        flask.abort(404)
     return flask.render_template('article.html',
                                  article=article,
                                  user=flask.g.user)
@@ -51,7 +76,9 @@ def edit(article_id=None):
     if article_id is None:
         source = ''
     else:
-        article = mongo.db.articles.find_one_or_404(article_id)
+        article = mongo.db.articles.find_one(article_id)
+        if article is None:
+            flask.abort(404)
         source = article.source
     return flask.render_template('edit.html',
                                  source=source,
