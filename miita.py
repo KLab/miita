@@ -1,10 +1,10 @@
 # coding: utf-8
-import bson
+import bson.tz_util
 import datetime
 import flask
 from flask import Flask
 from flask.ext.googleauth import GoogleFederated  # for Google Apps
-#from flask.ext.googleauth import GoogleAuth  # for Google account
+from flask.ext.googleauth import GoogleAuth  # for Google account
 import markdown
 import pymongo
 import sys
@@ -27,8 +27,11 @@ app.secret_key = 'random secret key: Override on real environment'
 # override settings with envvar
 app.config.from_envvar('MIITA_SETTING_FILE', silent=True)
 
-auth = GoogleFederated(app, 'klab.com')
-#auth = GoogleAuth(app)
+
+if 'DOMAIN' in app.config:
+    auth = GoogleFederated(app, app.config['DOMAIN'])
+else:
+    auth = GoogleAuth(app)
 
 
 class MongoProxy(object):
@@ -45,6 +48,13 @@ class MongoProxy(object):
 mongo = MongoProxy()
 
 
+@app.template_filter()
+def localtime(dt, format='%Y-%m-%d %H:%M:%S'):
+    u"""utcの時間を日本時間で指定されたフォーマットで文字列化する."""
+    local = dt + datetime.timedelta(hours=9)
+    return local.strftime(format)
+
+
 def get_author_name():
     user = flask.g.user
     return user['last_name'] + ' ' + user['first_name']
@@ -59,6 +69,19 @@ def index():
             article['title'] = flask.Markup(
                     article['source'].split('\n', 1)[0])
     return flask.render_template('index.html',
+                                 articles=articles,
+                                 user=flask.g.user)
+
+@app.route('/tags/<tag>')
+def tags(tag):
+    articles = mongo.db.articles.find({'tags': tag}).sort('_id', -1)[:10]
+    articles = list(articles)
+    for article in articles:
+        if not article.get('title'):
+            article['title'] = flask.Markup(
+                article['source'].split('\n', 1)[0])
+    return flask.render_template('index.html',
+                                 selected_tag=tag,
                                  articles=articles,
                                  user=flask.g.user)
 

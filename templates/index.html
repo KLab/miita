@@ -1,17 +1,25 @@
 {% extends 'layout.html' %}
 {% block content %}
-    <div class="row">
-        <div class="span10">
+    <div class="row-fluid">
+        <div class="span9">
+            {% if selected_tag is defined %}
+            <h2>{{ selected_tag }}</h1>
+            {% endif %}
             {% for article in articles %}
                 <article class="summary">
-                    <h1>
+                    <h3>
                     <a href="{{ url_for('article', article_id=article._id) }}">{{ article.title }}</a>
-                    </h1>
-                    {{ article.html|safe }}
+                    </h3>
+                        {% for tag in article.tags %}
+                            <a href="{{ url_for('tags', tag=tag) }}" class="taglink">{{ tag }}</a>
+                        {% endfor %}
+                    <div>
+                        {{ article.html|safe }}
+                    </div>
                 </article>
             {% endfor %}
         </div>
-        <div class="span2">
+        <div class="span3">
             <a class="btn btn-primary" href="{{ url_for('edit') }}">新しい記事を投稿する</a>
             <br>
         </div>

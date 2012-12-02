@@ -6,6 +6,7 @@ div#header {
     color: #ffffff;
     font-size: 30px;
     display: block;
+    margin-bottom: 10px;
 }
 
 #logo {
@@ -34,8 +35,9 @@ textarea.content-form {
 }
 
 article {
-    margin: 15px;
-    padding: 15px;
+    margin: 10px;
+    margin-left: 5px;
+    padding: 10px;
     border: solid 1px;
     border-radius: 10px;
 }
@@ -49,4 +51,17 @@ div.info-header {
     width: 100%;
     background-color: #cccccc;
     text-align: right;
+}
+
+a.taglink {
+    background-color: #19177C;
+    color: #ffffff;
+    font-weight: bold;
+    display: inline-block;
+    margin: 2px;
+    padding: 4px;
+    border-style: solid;
+    border-radius: 8px;
+    font-size: 100%;
+    text-decoration: none;
 }
