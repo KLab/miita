@@ -4,11 +4,6 @@
         <div class="span9">
         <article>
             <h1>{{ article.title }}</h1>
-            <div>
-                {% for tag in article.tags %}
-                    <a class="taglink" href="{{ url_for('tags', tag=tag) }}">{{ tag }}</a>
-                {% endfor %}
-            </div>
             <div class="info-header">
                 {{ article['author-name'] }}
                 {{ article._id.generation_time|localtime }}
@@ -20,10 +15,10 @@
         </article>
         </div>
         <div class="span3">
-            <h2>この記事のタグ</h2>
+            <h3>この記事のタグ</h3>
             <ul>
                 {% for tag in article.tags %}
-                <li><a class="taglink" href="{{url_for('tags', tag=tag)}}">{{ tag }}</a></li>
+                <li>{{ taglink(tag) }}</li>
                 {% endfor %}
             </ul>
         </div>

@@ -1,3 +1,6 @@
+{%- macro taglink(tag) -%}
+<a href="{{ url_for('tags', tag=tag) }}" class="taglink">{{ tag }}</a>
+{%- endmacro -%}
 <!DOCTYPE html>
 <html>
 <head>
