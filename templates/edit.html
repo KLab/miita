@@ -4,7 +4,7 @@
         <div class="span10">
             <form class="editform" method="post" action="{{ url_for('post') }}">
                 <label for="title">タイトル</label>
-                <input class="title-form" type="text" size="30" name="title">
+                <input class="title-form" type="text" size="30" name="title" value="{{ title }}">
 
                 <label for="source">内容</label>
                 <textarea class="content-form" name="source">{{ source }}</textarea><br/>

@@ -34,12 +34,19 @@ textarea.content-form {
 }
 
 article {
-    margin: 10px;
+    margin: 15px;
+    padding: 15px;
     border: solid 1px;
-    border-radius: 15px;
+    border-radius: 10px;
 }
 
 article.summary {
     max-height: 300px;
     overflow: hidden;
+}
+
+div.info-header {
+    width: 100%;
+    background-color: #cccccc;
+    text-align: right;
 }

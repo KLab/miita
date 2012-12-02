@@ -45,10 +45,15 @@ class MongoProxy(object):
 mongo = MongoProxy()
 
 
+def get_author_name():
+    user = flask.g.user
+    return user['last_name'] + ' ' + user['first_name']
+
 @app.route('/')
 @auth.required
 def index():
     articles = mongo.db.articles.find().sort('_id', -1)[:10]
+    articles = list(articles)
     for article in articles:
         if not article.get('title'):
             article['title'] = flask.Markup(
@@ -74,13 +79,17 @@ def article(article_id):
 @auth.required
 def edit(article_id=None):
     if article_id is None:
-        source = ''
+        source = title = ''
     else:
         article = mongo.db.articles.find_one(article_id)
         if article is None:
             flask.abort(404)
-        source = article.source
+        if article.get('author-email') != flask.g.user['email']:
+            flask.abort(403)
+        source = article['source']
+        title = article['title']
     return flask.render_template('edit.html',
+                                 title=title,
                                  source=source,
                                  user=flask.g.user)
 
@@ -92,7 +101,7 @@ def post():
     source = flask.request.form.get('source')
     html = markdown.markdown(source,
                              output_format='html5',
-                             extensions=['extra', 'codehilite'],
+                             extensions=['extra', 'codehilite', 'nl2br'],
                              safe_mode=True)
 
     if article_id:
@@ -104,7 +113,7 @@ def post():
     article['source'] = source
     article['html'] = html
     article['title'] = flask.request.form.get('title')
-    article['author-name'] = flask.g.user['name']
+    article['author-name'] = get_author_name()
     article['author-email'] = flask.g.user['email']
     article['last-update'] = datetime.datetime.utcnow()
     wrote_id = mongo.db.articles.save(article)

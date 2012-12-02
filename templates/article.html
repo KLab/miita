@@ -4,6 +4,13 @@
         <div class="span10">
         <article>
             <h1>{{ article.title }}</h1>
+            <div class="info-header">
+                {{ article['author-name'] }}
+                {{ article._id.generation_time }}
+                {% if article['author-email'] == user.email %}
+                    <a href="{{ url_for('edit', article_id=article._id) }}">(編集)</a>
+                {% endif %}
+            </div>
             {{ article.html|safe }}
         </article>
         </div>
