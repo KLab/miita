@@ -15,7 +15,12 @@
         </article>
         </div>
         <div class="span2">
-            <h2>right</h2>
+            <h2>この記事のタグ</h2>
+            <ul>
+                {% for tag in article.tags %}
+                <li>{{ tag }}</li>
+                {% endfor %}
+            </ul>
         </div>
     </div>
 {% endblock %}

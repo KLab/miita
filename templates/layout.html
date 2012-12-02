@@ -11,7 +11,7 @@
 <body>
 <div id="header">
     <div id="logo"><a href="{{ url_for('index') }}">miita</a></div>
-    <div id="account">{{ user.name }} ({{ user.email }})</div>
+    <div id="account">{{ user.last_name }} {{ user.first_name }} ({{ user.email }})</div>
 </div>
 
 <div class="container-fluid">

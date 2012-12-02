@@ -2,12 +2,16 @@
 {% block content %}
     <div class="row">
         <div class="span10">
-            <form class="editform" method="post" action="{{ url_for('post') }}">
+            <form class="editform" method="post" action="{{ url_for('post', article_id=article_id) }}">
                 <label for="title">タイトル</label>
                 <input class="title-form" type="text" size="30" name="title" value="{{ title }}">
-
+                <br>
                 <label for="source">内容</label>
-                <textarea class="content-form" name="source">{{ source }}</textarea><br/>
+                <textarea class="content-form" name="source">{{ source }}</textarea>
+                <br>
+                <label for="tags">タグ(スペース区切り):</label>
+                <input class="title-form" type="text" name="tags" value="{{ tags|join(' ') }}">
+                <br>
                 <input type="submit" value="保存">
             </form>
         </div>

@@ -80,6 +80,7 @@ def article(article_id):
 def edit(article_id=None):
     if article_id is None:
         source = title = ''
+        tags = []
     else:
         article = mongo.db.articles.find_one(article_id)
         if article is None:
@@ -88,9 +89,12 @@ def edit(article_id=None):
             flask.abort(403)
         source = article['source']
         title = article['title']
+        tags = article['tags']
     return flask.render_template('edit.html',
+                                 article_id=article_id,
                                  title=title,
                                  source=source,
+                                 tags=tags,
                                  user=flask.g.user)
 
 
@@ -116,6 +120,7 @@ def post():
     article['author-name'] = get_author_name()
     article['author-email'] = flask.g.user['email']
     article['last-update'] = datetime.datetime.utcnow()
+    article['tags'] = flask.request.form.get('tags').split()
     wrote_id = mongo.db.articles.save(article)
     return flask.redirect(flask.url_for('article', article_id=wrote_id))
 
