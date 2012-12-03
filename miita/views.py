@@ -53,8 +53,7 @@ def items(item_id):
 @auth.required
 def edit(item_id=None):
     if item_id is None:
-        source = title = ''
-        tags = []
+        item = Item()
     else:
         item = Item.objects.get_or_404(id=item_id)
         if item.author != flask.g.user:
@@ -63,10 +62,7 @@ def edit(item_id=None):
         title = item.title
         tags = item.tags
     return flask.render_template('edit.html',
-                                 article_id=item_id,
-                                 title=title,
-                                 source=source,
-                                 tags=tags,
+                                 item=item,
                                  user=flask.g.user)
 
 
