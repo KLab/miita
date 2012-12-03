@@ -1,4 +1,8 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
+u"""
+app オブジェクトの生成、カスタマイズをする
+"""
+
 import bson.tz_util
 import datetime
 from flask import Flask
@@ -6,9 +10,11 @@ from flask.ext.googleauth import GoogleFederated  # for Google Apps
 from flask.ext.googleauth import GoogleAuth  # for Google account
 import pymongo
 from werkzeug.routing import BaseConverter
+from werkzeug.utils import cached_property
 
 
 class ObjectIdConverter(BaseConverter):
+    u"""route に <ObjectId:xxxx> と書けるようにする"""
     def to_python(self, value):
         return bson.ObjectId(value)
 
@@ -21,7 +27,7 @@ app.url_map.converters['ObjectId'] = ObjectIdConverter
 
 app.secret_key = 'random secret key: Override on real environment'
 
-# override settings with envvar
+# 環境変数が設定されてる場合、それで設定をオーバーライドする.
 app.config.from_envvar('MIITA_SETTING_FILE', silent=True)
 
 
@@ -31,14 +37,14 @@ else:
     auth = GoogleAuth(app)
 
 
+# mogno.db.collection_name でアクセスできるようにするプロキシ
 class MongoProxy(object):
-    @property
+    @cached_property
     def con(self):
         host = app.config.get('MONGO_URI', 'localhost')
-        self.__dict__['con'] = con = pymongo.MongoClient(host)
-        return con
+        return pymongo.MongoClient(host)
 
-    @property
+    @cached_property
     def db(self):
         return self.con.miita
 
