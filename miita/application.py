@@ -6,8 +6,8 @@ app オブジェクトの生成、カスタマイズをする
 import bson.tz_util
 import datetime
 from flask import Flask
-from flask.ext.googleauth import GoogleFederated  # for Google Apps
-from flask.ext.googleauth import GoogleAuth  # for Google account
+from flask.ext.googleauth import (GoogleFederated, GoogleAuth)
+from flask.ext.mongoengine import MongoEngine
 import pymongo
 from werkzeug.routing import BaseConverter
 from werkzeug.utils import cached_property
@@ -23,9 +23,12 @@ class ObjectIdConverter(BaseConverter):
 
 
 app = Flask(__name__)
-app.url_map.converters['ObjectId'] = ObjectIdConverter
+#app.url_map.converters['ObjectId'] = ObjectIdConverter
 
-app.secret_key = 'random secret key: Override on real environment'
+app.config.update(
+    SECRET_KEY = 'random secret key: Override on real environment',
+    MONGODB_SETTINGS = {'DB': 'miita'}
+)
 
 # 環境変数が設定されてる場合、それで設定をオーバーライドする.
 app.config.from_envvar('MIITA_SETTING_FILE', silent=True)
@@ -37,18 +40,7 @@ else:
     auth = GoogleAuth(app)
 
 
-# mogno.db.collection_name でアクセスできるようにするプロキシ
-class MongoProxy(object):
-    @cached_property
-    def con(self):
-        host = app.config.get('MONGO_URI', 'localhost')
-        return pymongo.MongoClient(host)
-
-    @cached_property
-    def db(self):
-        return self.con.miita
-
-mongo = MongoProxy()
+mongo = MongoEngine(app)
 
 
 @app.template_filter()

@@ -10,7 +10,7 @@
             {% for article in articles %}
                 <article class="summary">
                     <h3>
-                    <a href="{{ url_for('items', article_id=article._id) }}">{{ article.title }}</a>
+                    <a href="{{ url_for('.items', item_id=article.id) }}">{{ article.title }}</a>
                     </h3>
                         {% for tag in article.tags %}{{ taglink(tag) }}{% endfor %}
                     <div>
@@ -20,7 +20,7 @@
             {% endfor %}
         </div>
         <div class="span3">
-            <a class="btn btn-primary" href="{{ url_for('edit') }}">新しい記事を投稿する</a>
+            <a class="btn btn-primary" href="{{ url_for('.edit') }}">新しい記事を投稿する</a>
             <br>
         </div>
     </div>

@@ -2,7 +2,7 @@
 {% block content %}
     <div class="row-fluid">
         <div class="span10">
-            <form class="editform" method="post" action="{{ url_for('post', article_id=article_id) }}">
+            <form class="editform" method="post" action="{{ url_for('.post', article_id=article_id) }}">
                 <label for="title">タイトル</label>
                 <input class="title-form" type="text" size="30" name="title" value="{{ title }}">
                 <br>

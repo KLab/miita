@@ -1,71 +1,69 @@
 import flask
-from .app import auth, mongo, app
+from .application import auth, mongo
+from .models import User, Item
 import markdown
+import datetime
 
 
-def get_author_name():
+def _get_login_name():
     user = flask.g.user
-    return user['last_name'] + ' ' + user['first_name']
+    return user.last_name + ' ' + user.first_name
+
+app = flask.Blueprint('miita', __name__)
+
+@app.before_request
+def get_user():
+    user, _ = User.objects.get_or_create(name=_get_login_name(),
+                                         email=flask.g.user.email)
+    flask.g.user = user
 
 
 @app.route('/')
 @auth.required
 def index():
-    articles = mongo.db.articles.find().sort('_id', -1)[:10]
-    articles = list(articles)
-    for article in articles:
-        if not article.get('title'):
-            article['title'] = flask.Markup(
-                article['source'].split('\n', 1)[0])
+    items = Item.objects.order_by('-id')[:10]
+    items = list(items)
     return flask.render_template('index.html',
-                                 articles=articles,
+                                 articles=items,
                                  user=flask.g.user)
 
 
 @app.route('/tags/<tag>')
 @auth.required
 def tags(tag):
-    articles = mongo.db.articles.find({'tags': tag}).sort('_id', -1)[:10]
-    articles = list(articles)
-    for article in articles:
-        if not article.get('title'):
-            article['title'] = flask.Markup(
-                article['source'].split('\n', 1)[0])
+    items = Item.objects(tags=tag).order_by('-id')[:10]
+    items = list(items)
     return flask.render_template('index.html',
                                  selected_tag=tag,
-                                 articles=articles,
+                                 articles=items,
                                  user=flask.g.user)
 
 
-@app.route('/items/<ObjectId:article_id>')
+@app.route('/items/<item_id>')
 @auth.required
-def items(article_id):
-    article = mongo.db.articles.find_one(article_id)
-    if article is None:
-        flask.abort(404)
+def items(item_id):
+    item = Item.objects.get_or_404(id=item_id)
     return flask.render_template('article.html',
-                                 article=article,
+                                 article=item,
                                  user=flask.g.user)
 
 
-@app.route('/edit/<ObjectId:article_id>')
+@app.route('/edit/<item_id>')
 @app.route('/edit')
 @auth.required
-def edit(article_id=None):
-    if article_id is None:
+def edit(item_id=None):
+    if item_id is None:
         source = title = ''
         tags = []
     else:
-        article = mongo.db.articles.find_one(article_id)
-        if article is None:
-            flask.abort(404)
-        if article.get('author-email') != flask.g.user['email']:
+        item = Item.objects.get_or_404(id=item_id)
+        if item.author != flask.g.user:
             flask.abort(403)
-        source = article['source']
-        title = article['title']
-        tags = article['tags']
+        source = item.source
+        title = item.title
+        tags = item.tags
     return flask.render_template('edit.html',
-                                 article_id=article_id,
+                                 article_id=item_id,
                                  title=title,
                                  source=source,
                                  tags=tags,
@@ -75,26 +73,25 @@ def edit(article_id=None):
 @app.route('/post', methods=['POST'])
 @auth.required
 def post():
-    article_id = flask.request.form.get('article')
+    item_id = flask.request.form.get('article')
     source = flask.request.form.get('source')
     html = markdown.markdown(source,
                              output_format='html5',
                              extensions=['extra', 'codehilite', 'nl2br'],
                              safe_mode=True)
 
-    if article_id:
-        article = mongo.db.articles.find_one_or_404(article_id)
-        if article.get('author-email') != flask.g.user['email']:
+    if item_id:
+        item = Item.objects.get_or_404(id=item_id)
+        if item.author != flask.g.user:
             flask.abort(403)
     else:
-        article = {}
-    article['source'] = source
-    article['html'] = html
-    article['title'] = flask.request.form.get('title')
-    article['author-name'] = get_author_name()
-    article['author-email'] = flask.g.user['email']
-    article['last-update'] = datetime.datetime.utcnow()
-    article['tags'] = flask.request.form.get('tags').split()
-    wrote_id = mongo.db.articles.save(article)
-    return flask.redirect(flask.url_for('items', article_id=wrote_id))
+        item = Item()
+    item.source = source
+    item.html = html
+    item.title = flask.request.form.get('title')
+    item.author = flask.g.user
+    item.updated_at = datetime.datetime.utcnow()
+    item.tags = flask.request.form.get('tags').split()
+    item.save()
+    return flask.redirect(flask.url_for('.items', item_id=item.id))
 

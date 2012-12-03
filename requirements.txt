@@ -1,8 +1,10 @@
 Flask
 Flask-GoogleAuth
+flask-mongoengine
 pymongo
 Jinja2
 Markdown
 Pygments
 Werkzeug
 requests
+ipython

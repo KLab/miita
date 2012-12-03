@@ -5,10 +5,10 @@
         <article>
             <h1>{{ article.title }}</h1>
             <div class="info-header">
-                {{ article['author-name'] }}
-                {{ article._id.generation_time|localtime }}
-                {% if article['author-email'] == user.email %}
-                    <a href="{{ url_for('edit', article_id=article._id) }}">(編集)</a>
+                {{ article.author.name }}
+                {{ article.id.generation_time|localtime }}
+                {% if article.author == user %}
+                    <a href="{{ url_for('.edit', item_id=article.id) }}">(編集)</a>
                 {% endif %}
             </div>
             {{ article.html|safe }}
