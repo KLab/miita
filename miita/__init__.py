@@ -146,6 +146,3 @@ def post():
     article['tags'] = flask.request.form.get('tags').split()
     wrote_id = mongo.db.articles.save(article)
     return flask.redirect(flask.url_for('article', article_id=wrote_id))
-
-if __name__ == '__main__':
-    app.run(debug=True)

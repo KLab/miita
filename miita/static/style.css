@@ -14,6 +14,10 @@ div#header {
     font-size: 40px;
     margin: 0px 20px;
     width: 100px;
+    text-decoration: none;
+}
+#logo > a {
+    color: white;
 }
 
 #account {
@@ -59,8 +63,8 @@ a.taglink {
     font-weight: bold;
     display: inline-block;
     margin: 2px;
-    padding: 4px;
-    border-style: solid;
+    padding: 4px 8px;
+/*    border-style: solid; */
     border-radius: 8px;
     font-size: 100%;
     text-decoration: none;

@@ -4,6 +4,8 @@
         <div class="span9">
             {% if selected_tag is defined %}
             <h2>{{ selected_tag }}</h1>
+            {% else %}
+            <h2>最近の投稿</h2>
             {% endif %}
             {% for article in articles %}
                 <article class="summary">
