@@ -23,6 +23,7 @@ def index():
 
 
 @app.route('/tags/<tag>')
+@auth.required
 def tags(tag):
     articles = mongo.db.articles.find({'tags': tag}).sort('_id', -1)[:10]
     articles = list(articles)
@@ -36,9 +37,9 @@ def tags(tag):
                                  user=flask.g.user)
 
 
-@app.route('/article/<ObjectId:article_id>')
+@app.route('/items/<ObjectId:article_id>')
 @auth.required
-def article(article_id):
+def items(article_id):
     article = mongo.db.articles.find_one(article_id)
     if article is None:
         flask.abort(404)
@@ -95,5 +96,5 @@ def post():
     article['last-update'] = datetime.datetime.utcnow()
     article['tags'] = flask.request.form.get('tags').split()
     wrote_id = mongo.db.articles.save(article)
-    return flask.redirect(flask.url_for('article', article_id=wrote_id))
+    return flask.redirect(flask.url_for('items', article_id=wrote_id))
 

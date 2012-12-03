@@ -10,7 +10,7 @@
             {% for article in articles %}
                 <article class="summary">
                     <h3>
-                    <a href="{{ url_for('article', article_id=article._id) }}">{{ article.title }}</a>
+                    <a href="{{ url_for('items', article_id=article._id) }}">{{ article.title }}</a>
                     </h3>
                         {% for tag in article.tags %}{{ taglink(tag) }}{% endfor %}
                     <div>
