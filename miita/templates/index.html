@@ -2,11 +2,17 @@
 {% block content %}
     <div class="row-fluid">
         <div class="span9">
-            {% if selected_tag is defined %}
-            <h2>{{ selected_tag }}</h1>
-            {% else %}
+            {% if selected_tag is defined -%}
+            <h2>{{ selected_tag }}
+                {% if selected_tag in user.follow_tags %}
+                    <small>フォロー済み</small>
+                {% else %}
+                    <small><a href="#" id="btn-follow-tag" data-tag="{{ selected_tag }}">このタグをフォローする</a></small>
+                {% endif %}
+            </h2>
+            {%- else -%}
             <h2>最近の投稿</h2>
-            {% endif %}
+            {%- endif %}
             {% for article in articles %}
                 <article class="summary">
                     <h3>
@@ -24,4 +30,9 @@
             <br>
         </div>
     </div>
+    <script>
+    jQuery('#btn-follow-tag').on('click', function(source) {
+        jQuery.ajax("{{ url_for('.follow') }}?tag=" + source.target.getAttribute('data-tag'));
+    });
+    </script>
 {% endblock %}

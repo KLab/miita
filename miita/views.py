@@ -21,12 +21,28 @@ def get_user():
 @app.route('/')
 @auth.required
 def index():
-    items = Item.objects.order_by('-id')[:10]
+    user = flask.g.user
+    tags = user.follow_tags
+    if not tags:
+        items = Item.objects.order_by('-id')[:10]
+    else:
+        items = Item.objects(tags__in=tags).order_by('-id')[:10]
     items = list(items)
     return flask.render_template('index.html',
                                  articles=items,
                                  user=flask.g.user)
 
+
+@app.route('/follow')
+@auth.required
+def follow():
+    user = flask.g.user
+    tag = flask.request.args.get('tag')
+    if tag:
+        print tag
+        user.follow_tags.append(tag)
+        user.save()
+    return "OK"
 
 @app.route('/tags/<tag>')
 @auth.required
