@@ -28,6 +28,12 @@
         <div class="span3">
             <a class="btn btn-primary" href="{{ url_for('.edit') }}">新しい記事を投稿する</a>
             <br>
+        <h3>フォローしているタグ</h3>
+            <ul>
+                {% for tag in user.follow_tags %}
+                <li>{{ taglink(tag) }}</li>
+                {% endfor %}
+            </ul>
         </div>
     </div>
     <script>
