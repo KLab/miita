@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html>
+{# タグへのリンクを作るマクロ #}
+{%- macro taglink(tag) -%}
+    <a href="{{ url_for('.tags', tag=tag) }}" class="taglink">{{ tag }}</a>
+{%- endmacro -%}<html>
 <head>
     <title>miita</title>
     <link href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}" rel="stylesheet" media="screen">
@@ -18,7 +21,3 @@
 </div>
 </body>
 </html>
-{# タグへのリンクを作るマクロ #}
-{%- macro taglink(tag) -%}
-    <a href="{{ url_for('.tags', tag=tag) }}" class="taglink">{{ tag }}</a>
-{%- endmacro -%}
