@@ -1,25 +1,26 @@
+# -*- coding: utf-8 -*-
 import flask
-from .application import auth, mongo
+from .application import auth
 from .models import User, Item
 import markdown
 import datetime
 
 
-def _get_login_name():
-    user = flask.g.user
-    return user.last_name + ' ' + user.first_name
+bp = flask.Blueprint('miita', __name__)
 
-app = flask.Blueprint('miita', __name__)
 
-@app.before_request
+@bp.before_request
+@auth.required
 def get_user():
-    user, _ = User.objects.get_or_create(name=_get_login_name(),
-                                         email=flask.g.user.email)
+    u"""flask.g.user を GoogleAuth が作ったオブジェクトから models.User に置き換える."""
+    user = flask.g.user
+    email = user.email
+    name = user.last_name + ' ' + user.first_name
+    user, _ = User.objects.get_or_create(name=name, email=email)
     flask.g.user = user
 
 
-@app.route('/')
-@auth.required
+@bp.route('/')
 def index():
     user = flask.g.user
     tags = user.follow_tags
@@ -33,8 +34,7 @@ def index():
                                  user=flask.g.user)
 
 
-@app.route('/follow')
-@auth.required
+@bp.route('/follow')
 def follow():
     user = flask.g.user
     tag = flask.request.args.get('tag')
@@ -44,8 +44,8 @@ def follow():
         user.save()
     return "OK"
 
-@app.route('/tags/<tag>')
-@auth.required
+
+@bp.route('/tags/<tag>')
 def tags(tag):
     items = Item.objects(tags=tag).order_by('-id')[:10]
     items = list(items)
@@ -55,8 +55,7 @@ def tags(tag):
                                  user=flask.g.user)
 
 
-@app.route('/items/<item_id>')
-@auth.required
+@bp.route('/items/<item_id>')
 def items(item_id):
     item = Item.objects.get_or_404(id=item_id)
     return flask.render_template('article.html',
@@ -64,9 +63,8 @@ def items(item_id):
                                  user=flask.g.user)
 
 
-@app.route('/edit/<item_id>')
-@app.route('/edit')
-@auth.required
+@bp.route('/edit/<item_id>')
+@bp.route('/edit')
 def edit(item_id=None):
     if item_id is None:
         item = Item()
@@ -82,8 +80,7 @@ def edit(item_id=None):
                                  user=flask.g.user)
 
 
-@app.route('/post', methods=['POST'])
-@auth.required
+@bp.route('/post', methods=['POST'])
 def post():
     item_id = flask.request.form.get('article')
     source = flask.request.form.get('source')
@@ -106,4 +103,3 @@ def post():
     item.tags = flask.request.form.get('tags').split()
     item.save()
     return flask.redirect(flask.url_for('.items', item_id=item.id))
-
