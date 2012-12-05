@@ -2,7 +2,7 @@
 {% block content %}
     <div class="row-fluid">
         <div class="span10">
-            <form class="editform" method="post" action="{{ url_for('.post', item_id=item.id) }}">
+            <form class="editform" method="post" action="{{ url_for('.post') }}">
                 <label for="title">タイトル</label>
                 <input class="title-form" type="text" size="30" name="title" value="{{ item.title }}">
                 <br>
@@ -12,6 +12,9 @@
                 <label for="tags">タグ(スペース区切り):</label>
                 <input class="title-form" type="text" name="tags" value="{{ item.tags|join(' ') }}">
                 <br>
+                {% if item.id %}
+                <input type="hidden" name="item_id" value="{{ item.id }}">
+                {% endif %}
                 <input type="submit" value="保存">
             </form>
         </div>

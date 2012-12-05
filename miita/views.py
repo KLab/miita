@@ -82,7 +82,7 @@ def edit(item_id=None):
 
 @bp.route('/post', methods=['POST'])
 def post():
-    item_id = flask.request.form.get('article')
+    item_id = flask.request.form.get('item_id')
     source = flask.request.form.get('source')
     html = markdown.markdown(source,
                              output_format='html5',
