@@ -3,15 +3,16 @@
     <div class="row-fluid">
         <div class="span9">
             {% if selected_tag is defined -%}
-            <h2>{{ selected_tag }}
-                {% if selected_tag in user.follow_tags %}
-                    <small>フォロー済み</small>
-                {% else %}
-                    <small><a href="#" id="btn-follow-tag" data-tag="{{ selected_tag }}">このタグをフォローする</a></small>
-                {% endif %}
-            </h2>
+            <h2>{{ selected_tag }}</h2>
+            <span id="span-unfollow">フォロー済み<a href="#" class="btn btn-warning btn-mini"
+                             id="btn-unfollow-tag" data-tag="{{ selected_tag }}">フォロー解除</a> </span>
+            <span id="span-follow"><a href="#" class="btn btn-primary btn-mini"
+                      id="btn-follow-tag" data-tag="{{ selected_tag }}">このタグをフォローする</a></span>
             {%- else -%}
             <h2>最近の投稿</h2>
+            {% if not all %}
+                <a href="{{ url_for('.index', all=1) }}">全ての記事を見る</a>
+            {% endif %}
             {%- endif %}
             {% for article in articles %}
                 <article class="summary">
@@ -28,17 +29,49 @@
         <div class="span3">
             <a class="btn btn-primary" href="{{ url_for('.edit') }}">新しい記事を投稿する</a>
             <br>
+        {% if not selected_tag %}
         <h3>フォローしているタグ</h3>
             <ul>
                 {% for tag in user.follow_tags %}
                 <li>{{ taglink(tag) }}</li>
                 {% endfor %}
             </ul>
+        {% endif %}
         </div>
     </div>
     <script>
+    {% if selected_tag %}
+    var selected_tag = "{{ selected_tag }}";
+    {% if selected_tag in user.follow_tags %}
+        jQuery('#span-follow').hide();
+    {% else %}
+        jQuery('#span-unfollow').hide();
+    {% endif %}
+
     jQuery('#btn-follow-tag').on('click', function(source) {
-        jQuery.ajax("{{ url_for('.follow') }}?tag=" + source.target.getAttribute('data-tag'));
+        jQuery.ajax({
+            url: "{{ url_for('.follow') }}",
+            data: {
+                enable: 1,
+                tag: source.target.getAttribute('data-tag')},
+            success: function() {
+                jQuery('#span-follow').hide();
+                jQuery('#span-unfollow').show();
+            }
+        });
     });
+    jQuery('#btn-unfollow-tag').on('click', function(source) {
+        jQuery.ajax({
+            url: "{{ url_for('.follow') }}",
+            data: {
+                enable: 0,
+                tag: source.target.getAttribute('data-tag')},
+            success: function() {
+                jQuery('#span-follow').show();
+                jQuery('#span-unfollow').hide();
+            }
+        });
+    });
+    {% endif %}
     </script>
 {% endblock %}

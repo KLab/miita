@@ -24,23 +24,31 @@ def get_user():
 def index():
     user = flask.g.user
     tags = user.follow_tags
-    if not tags:
+    all = int(flask.request.args.get('all', 0))
+    if all or not tags:
+        all = True
         items = Item.objects.order_by('-id')[:10]
     else:
         items = Item.objects(tags__in=tags).order_by('-id')[:10]
     items = list(items)
     return flask.render_template('index.html',
+                                 all=all,
                                  articles=items,
-                                 user=flask.g.user)
+                                 user=flask.g.user,
+                                 )
 
 
 @bp.route('/follow')
 def follow():
     user = flask.g.user
     tag = flask.request.args.get('tag')
+    enable = int(flask.request.args.get('enable'))
+    print tag, enable
     if tag:
-        print tag
-        user.follow_tags.append(tag)
+        if enable:
+            user.follow_tags.append(tag)
+        else:
+            user.follow_tags.remove(tag)
         user.save()
     return "OK"
 
