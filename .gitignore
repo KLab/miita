@@ -3,6 +3,5 @@
 .DS_Store
 .project
 .dotcloud
-dotcloud.yml
 wsgi.py
 setting_*.py

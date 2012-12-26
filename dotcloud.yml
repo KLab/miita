@@ -1,0 +1,10 @@
+www:
+  type: python
+  config:
+    python_version: v2.7
+    uwsgi_buffer_size: 8192
+    uwsgi_single_interpreter: true
+
+data:
+  type: mongodb
+
