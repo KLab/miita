@@ -10,7 +10,7 @@ from flask.ext.mongoengine import MongoEngine
 from .util import DummyAuth
 
 
-app = Flask(__name__)
+app = Flask('miita')
 
 app.config.update(
     SECRET_KEY = 'random secret key: Override on real environment',
